@@ -48,7 +48,7 @@ require 'packer'.startup(function()
   use 'tpope/vim-commentary'
   use 'tpope/vim-surround'
   use 'tpope/vim-repeat'
-  use { 'tpope/vim-fugitive', cmd = {'Git'} }
+  use 'tpope/vim-fugitive'
   use { 'mattn/emmet-vim', ft={'html', 'htmldjango'} }
   use { 'Vimjas/vim-python-pep8-indent', ft={'python'} }
 end)
