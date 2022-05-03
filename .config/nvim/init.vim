@@ -132,10 +132,19 @@ nvim_lsp.pyright.setup {
   on_attach = on_attach,
   settings = {
     python = {
-      venvPath = '/Users/e/.venv'
+      venvPath = '/Users/e/.venv',
+      analysis = {
+        autoSearchPaths = true,
+        diagnosticMode = 'openFilesOnly',
+        useLibraryCodeForTypes = true,
+        typeCheckingMode = 'off'
+      }
     }
   }
 }
+--nvim_lsp.pylsp.setup {
+--  on_attach = on_attach
+--}
 
 -- TYPESCRIPT
 nvim_lsp.tsserver.setup {
