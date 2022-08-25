@@ -27,7 +27,13 @@ let mapleader = " "
 
 filetype plugin on
 
-" set statusline+=%f\ ->\ %{nvim_treesitter#statusline()}
+set statusline+=%f\ ->\ %{nvim_treesitter#statusline()}
+
+" FOLDS
+set foldlevel=99
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+
 
 " ------------ LUA -------------
 lua << EOF
