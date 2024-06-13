@@ -1,5 +1,6 @@
 " TODO: backups in increments
-" TODO: builtin completion + emmet?
+" TODO: builtin completion
+" TODO: fix emmet
 " TODO: general mappings in the end
 " TODO: DAP?
 " TODO: Go full lua?
@@ -33,7 +34,7 @@ let mapleader = " "
 
 filetype plugin on
 
-set statusline+=%f\ ->\ %{nvim_treesitter#statusline()}
+ set statusline=%f\ ->\ %{nvim_treesitter#statusline()}%=%c\ %p\ %y
 
 " FOLDS
 set foldlevel=99
@@ -62,7 +63,6 @@ require 'packer'.startup(function()
   use { 'nvim-treesitter/nvim-treesitter', run=':TSUpdate' }  -- :TSInstall python
   use { 'mattn/emmet-vim', ft={'html', 'htmldjango'} }
 end)
-
 
 -- Navigator --
 local nav = require('Navigator')
@@ -140,6 +140,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
+    -- Completion
+    -- local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    -- vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+
     local opts = { buffer = ev.buf, silent = true }
     vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
@@ -151,23 +155,29 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
     vim.keymap.set({'n', 'v'}, '<leader>f', vim.lsp.buf.format, opts)
 
-
   end,
 })
 
-
-local signs = { Error = "●", Warn = "●", Hint = "●", Info = "●" }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
-end
-
 vim.diagnostic.config({
   virtual_text = false,
+  float = { border = "single" },
+  signs = {
+    text = {
+      [vim.diagnostic.severity.ERROR] = '●',
+      [vim.diagnostic.severity.WARN] = '●',
+      [vim.diagnostic.severity.HINT] = '●',
+      [vim.diagnostic.severity.INFO] = '●',
+    }
+  }
+})
+
+vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+  vim.lsp.handlers.hover, {
+    border = "single",
 })
 
 
--- Formatters -v
+-- Formatters
 local prettier = require "efm/prettier"
 local eslint = require "efm/eslint"
 local black = require "efm/black"
@@ -222,7 +232,23 @@ dap.configurations.python = {
 if vim.wo.diff then -- no syntax highlighting in diff mode
   vim.cmd 'syntax off'
 end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "htmldjango",
+  callback = function(args)
+    vim.bo[args.buf].commentstring = '{# %s #}'
+  end
+})
+
+-- THEME
 vim.cmd 'colorscheme base16-tomorrow-night'
+vim.api.nvim_set_hl(0, "DiffAdd", { bg = "#1d2f21" })
+vim.api.nvim_set_hl(0, "DiffDelete", { bg = "#2d1f21" })
+vim.api.nvim_set_hl(0, "DiffChange", { bg = "#1c2d3b" })
+vim.api.nvim_set_hl(0, "DiffText", { bg = "#2f4e66" })
+vim.api.nvim_set_hl(0, "MatchParen", { bg = "#373b41" })
+
+
 
 EOF
 
@@ -254,13 +280,3 @@ nnoremap <leader>gb :Git blame<CR>
 
 nnoremap <leader>db :lua require'dap'.toggle_breakpoint()<CR>
 nnoremap <leader>dc :lua require'dap'.continue()<CR>
-
-" THEME "
-augroup CustomAU | au!
-  autocmd ColorScheme * hi DiffAdd guibg=#1d2f21
-                    \ | hi DiffDelete guibg=#2d1f21
-                    \ | hi DiffChange guibg=#1c2d3b
-                    \ | hi DiffText guibg=#2f4e66
-                    \ | hi MatchParen guibg=#373b41
-  autocmd FileType htmldjango setlocal commentstring={#\ %s\ #}
-augroup END
