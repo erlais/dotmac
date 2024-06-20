@@ -1,9 +1,9 @@
 " TODO: backups in increments
 " TODO: builtin completion
 " TODO: fix emmet
-" TODO: general mappings in the end
 " TODO: DAP?
 " TODO: Go full lua?
+" TODO: Check out neogit
 
 " GLOBAL OPTIONS
 set hidden
@@ -34,7 +34,7 @@ let mapleader = " "
 
 filetype plugin on
 
- set statusline=%f\ ->\ %{nvim_treesitter#statusline()}%=%c\ %p\ %y
+set statusline=%f\ ->\ %{nvim_treesitter#statusline()}%=%c\ %p\ %y
 
 " FOLDS
 set foldlevel=99
@@ -64,16 +64,18 @@ require 'packer'.startup(function()
   use { 'mattn/emmet-vim', ft={'html', 'htmldjango'} }
 end)
 
+local key_map = vim.keymap.set
+
 -- Navigator --
 local nav = require('Navigator')
 nav.setup({
     auto_save = 'nil',
     disable_on_zoom = true
 })
-vim.keymap.set({'n', 't'}, '<M-h>', nav.left)
-vim.keymap.set({'n', 't'}, '<M-l>', nav.right)
-vim.keymap.set({'n', 't'}, '<M-k>', nav.up)
-vim.keymap.set({'n', 't'}, '<M-j>', nav.down)
+key_map({'n', 't'}, '<M-h>', nav.left)
+key_map({'n', 't'}, '<M-l>', nav.right)
+key_map({'n', 't'}, '<M-k>', nav.up)
+key_map({'n', 't'}, '<M-j>', nav.down)
 
 
 -- Telescope --
@@ -90,17 +92,17 @@ require('telescope').setup{
   },
 }
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<C-p>', function() builtin.find_files({previewer=false}) end)
-vim.keymap.set('n', '<A-p>', function() builtin.find_files({hidden=true, no_ignore=true, previewer=false}) end)
-vim.keymap.set('n', '<leader>l', function() builtin.live_grep({grep_open_files=true}) end)
-vim.keymap.set('n', '<leader>b', builtin.buffers)
-vim.keymap.set('n', '<leader>h', builtin.help_tags)
-vim.keymap.set('n', '<leader>/', builtin.search_history)
-vim.keymap.set('n', '<leader>:', builtin.command_history)
-vim.keymap.set('n', '<leader>r', builtin.resume)
-vim.keymap.set('n', '<leader>y', builtin.registers)
-vim.keymap.set('n', '<leader>t', builtin.lsp_document_symbols)
-vim.keymap.set('n', '<leader>s', ':Telescope grep_string search=')
+key_map('n', '<C-p>', function() builtin.find_files({previewer=false}) end)
+key_map('n', '<A-p>', function() builtin.find_files({hidden=true, no_ignore=true, previewer=false}) end)
+key_map('n', '<leader>l', function() builtin.live_grep({grep_open_files=true}) end)
+key_map('n', '<leader>b', builtin.buffers)
+key_map('n', '<leader>h', builtin.help_tags)
+key_map('n', '<leader>/', builtin.search_history)
+key_map('n', '<leader>:', builtin.command_history)
+key_map('n', '<leader>r', builtin.resume)
+key_map('n', '<leader>y', builtin.registers)
+key_map('n', '<leader>t', builtin.lsp_document_symbols)
+key_map('n', '<leader>s', ':Telescope grep_string search=')
 
 
 ---- LSP ----
@@ -130,10 +132,10 @@ lspconfig.tsserver.setup {
   end
 }
 
-vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float)
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist)
+key_map('n', '<leader>e', vim.diagnostic.open_float)
+key_map('n', '[d', vim.diagnostic.goto_prev)
+key_map('n', ']d', vim.diagnostic.goto_next)
+key_map('n', '<leader>q', vim.diagnostic.setloclist)
 
 
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -145,15 +147,15 @@ vim.api.nvim_create_autocmd('LspAttach', {
     -- vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
 
     local opts = { buffer = ev.buf, silent = true }
-    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
-    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
-    vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
-    vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
-    vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
-    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set({'n', 'v'}, '<leader>f', vim.lsp.buf.format, opts)
+    key_map('n', 'gD', vim.lsp.buf.declaration, opts)
+    key_map('n', 'gd', vim.lsp.buf.definition, opts)
+    key_map('n', 'K', vim.lsp.buf.hover, opts)
+    key_map('n', 'gi', vim.lsp.buf.implementation, opts)
+    key_map('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    key_map('n', '<leader>D', vim.lsp.buf.type_definition, opts)
+    key_map('n', '<leader>rn', vim.lsp.buf.rename, opts)
+    key_map('n', 'gr', vim.lsp.buf.references, opts)
+    key_map({'n', 'v'}, '<leader>f', vim.lsp.buf.format, opts)
 
   end,
 })
@@ -230,7 +232,7 @@ dap.configurations.python = {
 
 -- MISC
 if vim.wo.diff then -- no syntax highlighting in diff mode
-  vim.cmd 'syntax off'
+  vim.cmd('syntax off')
 end
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -248,35 +250,29 @@ vim.api.nvim_set_hl(0, "DiffChange", { bg = "#1c2d3b" })
 vim.api.nvim_set_hl(0, "DiffText", { bg = "#2f4e66" })
 vim.api.nvim_set_hl(0, "MatchParen", { bg = "#373b41" })
 
+-- General mappings
+key_map('n', 'Y', 'Y')
+key_map('n', '0', '_')
+key_map('n', '<leader>a', 'ggVG')
+key_map('n', '<leader>y', '"*y')
+key_map('n', '<leader>Y', '"*Y')
+key_map('n', '<leader>p', '"*P')
+key_map('n', '<leader><bs>', ':noh<cr>')
 
+key_map('n', '<leader>1', '1gt')
+key_map('n', '<leader>2', '2gt')
+key_map('n', '<leader>3', '3gt')
+key_map('n', '<leader>4', '4gt')
+key_map('n', '<leader>5', '5gt')
+key_map('n', '<leader>6', '6gt')
+key_map('n', '<leader>7', '7gt')
+key_map('n', '<leader>8', '8gt')
+key_map('n', '<leader>9', '9gt')
+
+key_map('n', '<leader>gg', ':Git<cr>')
+key_map('n', '<leader>gc', ':Git commit<cr>')
+key_map('n', '<leader>gl', ':Git log %<cr>')
+key_map('n', '<leader>gL', ':Git log --name-only<cr>')
+key_map('n', '<leader>gb', ':Git blame<cr>')
 
 EOF
-
-" General mappings "
-nnoremap Y Y
-nnoremap 0 _
-nnoremap <leader>a ggVG
-vnoremap <leader>y "*y
-nnoremap <leader>Y "*Y
-nnoremap <leader>p "*p
-nnoremap <leader>P "*P
-nnoremap <silent> <leader><BS> :noh<CR>
-
-nnoremap <leader>1 1gt
-nnoremap <leader>2 2gt
-nnoremap <leader>3 3gt
-nnoremap <leader>4 4gt
-nnoremap <leader>5 5gt
-nnoremap <leader>6 6gt
-nnoremap <leader>7 7gt
-nnoremap <leader>8 8gt
-nnoremap <leader>9 9gt
-
-nnoremap <leader>gg :Git<CR>
-nnoremap <leader>gc :Git commit<CR>
-nnoremap <leader>gL :Git log --name-only<CR>
-nnoremap <leader>gl :Git log %<CR>
-nnoremap <leader>gb :Git blame<CR>
-
-nnoremap <leader>db :lua require'dap'.toggle_breakpoint()<CR>
-nnoremap <leader>dc :lua require'dap'.continue()<CR>
