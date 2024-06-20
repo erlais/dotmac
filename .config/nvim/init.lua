@@ -1,48 +1,46 @@
-" TODO: backups in increments
-" TODO: builtin completion
-" TODO: fix emmet
-" TODO: DAP?
-" TODO: Go full lua?
-" TODO: Check out neogit
+-- TODO: backups in increments
+-- TODO: builtin completion
+-- TODO: fix emmet
+-- TODO: DAP?
+-- TODO: Check out neogit
+-- TODO: Fix S-K in vim help
 
-" GLOBAL OPTIONS
-set hidden
-set ignorecase
-set smartcase
-set nojoinspaces
-set gdefault
-set inccommand=nosplit
-set shortmess+=Ic
-set mouse=a
-set scrolloff=3
-set sidescrolloff=6
+-- GLOBAL OPTIONS
+vim.opt.hidden = true
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+vim.opt.joinspaces = false
+vim.opt.gdefault = true
+vim.opt.inccommand = 'nosplit'
+vim.opt.mouse = 'a'
+vim.opt.scrolloff = 3
+vim.opt.sidescrolloff = 6
+vim.opt.shortmess:append('Ic')
 
-" WINDOW OPTIONS
-set number
-set signcolumn=yes
-set wrap
-set list
+-- WINDOW OPTIONS
+vim.wo.number = true
+vim.wo.signcolumn = 'yes'
+vim.wo.wrap = true
+vim.wo.list = true
 
-" BUFFER OPTIONS
-set textwidth=0
-set expandtab
-set shiftwidth=2
-set softtabstop=2
-set tabstop=2
+-- BUFFER OPTIONS
+vim.bo.expandtab = true
+vim.bo.textwidth = 0
+vim.bo.shiftwidth = 2
+vim.bo.softtabstop = 2
+vim.bo.tabstop = 2
 
-let mapleader = " "
+-- FOLDS
+vim.wo.foldlevel = 99
+vim.wo.foldmethod = 'expr'
+vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
 
-filetype plugin on
+vim.g.mapleader = ' '
 
-set statusline=%f\ ->\ %{nvim_treesitter#statusline()}%=%c\ %p\ %y
+-- TODO: is this needed?
+vim.cmd('filetype plugin on')
 
-" FOLDS
-set foldlevel=99
-set foldmethod=expr
-set foldexpr=nvim_treesitter#foldexpr()
-
-
-lua << EOF
+vim.opt.statusline = '%f -> %{nvim_treesitter#statusline()}%=%c %p %y'
 
 -- PLUGINS --
 require 'packer'.startup(function()
@@ -275,4 +273,3 @@ key_map('n', '<leader>gl', ':Git log %<cr>')
 key_map('n', '<leader>gL', ':Git log --name-only<cr>')
 key_map('n', '<leader>gb', ':Git blame<cr>')
 
-EOF
