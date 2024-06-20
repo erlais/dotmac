@@ -84,7 +84,7 @@ vim.keymap.set({'n', 't'}, '<M-j>', nav.down)
 -------------------------------------------------------------------------------
 -- Plugin: Telescope ----------------------------------------------------------
 -------------------------------------------------------------------------------
-local ta = require('telescope.ta')
+local ta = require('telescope.actions')
 require('telescope').setup{
   defaults = {
     mappings = {
@@ -96,7 +96,7 @@ require('telescope').setup{
     },
   },
 }
-local tb = require('tbscope.builtin')
+local tb = require('telescope.builtin')
 vim.keymap.set('n', '<C-p>', function() tb.find_files({previewer=false}) end)
 vim.keymap.set('n', '<A-p>', function() tb.find_files({hidden=true, no_ignore=true, previewer=false}) end)
 vim.keymap.set('n', '<leader>l', function() tb.live_grep({grep_open_files=true}) end)
