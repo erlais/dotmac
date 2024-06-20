@@ -290,8 +290,8 @@ end
 vim.keymap.set('n', 'Y', 'Y')
 vim.keymap.set('n', '0', '_')
 vim.keymap.set('n', '<leader>a', 'ggVG')
-vim.keymap.set('n', '<leader>y', '"*y')
-vim.keymap.set('n', '<leader>Y', '"*Y')
+vim.keymap.set('v', '<leader>y', '"*y')
+vim.keymap.set('v', '<leader>Y', '"*Y')
 vim.keymap.set('n', '<leader>p', '"*P')
 vim.keymap.set('n', '<leader><bs>', ':noh<cr>')
 
