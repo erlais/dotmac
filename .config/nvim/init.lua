@@ -38,11 +38,7 @@ vim.bo.tabstop = 2
 
 vim.g.mapleader = ' '
 
--- TODO: is this needed?
-vim.cmd('filetype plugin on')
-
-vim.opt.statusline = '%f -> %{nvim_treesitter#statusline()}%=%c %p %y'
-
+vim.opt.statusline = ' %f%m %=%l,%c   %p%%   [%{&fileencoding?&fileencoding:&encoding}] '
 
 -------------------------------------------------------------------------------
 -- Plugin Init ----------------------------------------------------------------
@@ -304,3 +300,5 @@ vim.keymap.set('n', '<leader>6', '6gt')
 vim.keymap.set('n', '<leader>7', '7gt')
 vim.keymap.set('n', '<leader>8', '8gt')
 vim.keymap.set('n', '<leader>9', '9gt')
+
+vim.keymap.set('n', '<leader>x', function() print(vim.fn['nvim_treesitter#statusline']()) end)
