@@ -211,12 +211,13 @@ local eslint = require "efm/eslint"
 local black = require "efm/black"
 
 require "lspconfig".efm.setup {
+  filetypes = { 'python', 'typescript'},
   init_options = {documentFormatting = true, documentRangeFormatting = true},
   settings = {
     rootMarkers = {".git/"},
     languages = {
       typescript = {prettier, eslint},
-      python = {black}
+      python = {black},
     }
   }
 }
