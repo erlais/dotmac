@@ -1,4 +1,3 @@
--- TODO: backups in increments
 -- TODO: builtin completion
 -- TODO: fix emmet
 -- TODO: snippets
@@ -22,17 +21,16 @@ vim.opt.mouse = 'a'
 vim.opt.scrolloff = 3
 vim.opt.sidescrolloff = 6
 vim.opt.shortmess:append('Ic')
+vim.opt.statusline = ' %f%m %=%l,%c   %p%%   [%{&fileencoding?&fileencoding:&encoding}] '
 
 vim.wo.number = true
 vim.wo.signcolumn = 'yes'
 vim.wo.wrap = true
 vim.wo.list = true
-
 vim.wo.foldlevel = 99
 vim.wo.foldmethod = 'expr'
 vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
 
--- BUFFER OPTIONS
 vim.bo.expandtab = true
 vim.bo.textwidth = 0
 vim.bo.shiftwidth = 2
@@ -41,7 +39,18 @@ vim.bo.tabstop = 2
 
 vim.g.mapleader = ' '
 
-vim.opt.statusline = ' %f%m %=%l,%c   %p%%   [%{&fileencoding?&fileencoding:&encoding}] '
+-------------------------------------------------------------------------------
+-- Backups --------------------------------------------------------------------
+-------------------------------------------------------------------------------
+vim.opt.backup = true
+vim.opt.backupdir = os.getenv("HOME") .. '/.local/share/nvim/backup//'
+vim.api.nvim_create_autocmd('BufWritePre', {
+  group = vim.api.nvim_create_augroup('timestamp_backup', { clear = true }),
+  pattern = '*',
+  callback = function()
+    vim.opt.backupext = '-' .. vim.fn.strftime('%Y-%m-%d_%H%M')
+  end,
+})
 
 -------------------------------------------------------------------------------
 -- Plugin Init ----------------------------------------------------------------
