@@ -2,8 +2,6 @@
 -- TODO: fix emmet
 -- TODO: snippets
 -- TODO: DAP?
--- TODO: Check out neogit
--- TODO: Use lualine or just tweak custom statusline?
 -- TODO: A different python ls?
 -- TODO: Change efm to something else? pylsp, basedpyright, jedi, anakin, pylyzer, ruff
 -- TODO: Add js, html ls
@@ -39,6 +37,7 @@ vim.bo.tabstop = 2
 
 vim.g.mapleader = ' '
 
+
 -------------------------------------------------------------------------------
 -- Backups --------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -52,26 +51,39 @@ vim.api.nvim_create_autocmd('BufWritePre', {
   end,
 })
 
+
 -------------------------------------------------------------------------------
 -- Plugin Init ----------------------------------------------------------------
 -------------------------------------------------------------------------------
 require('packer').startup(function()
   use 'wbthomason/packer.nvim'
+
+  -- lsp
   use 'neovim/nvim-lspconfig'
   use 'mfussenegger/nvim-dap'
   use 'rcarriga/nvim-dap-ui'
+  use { 'nvim-treesitter/nvim-treesitter', run=':TSUpdate' }  -- :TSInstall python
+  use { 'mattn/emmet-vim', ft={'html', 'htmldjango'} }
+
+  -- git
+  use 'sindrets/diffview.nvim'
+  use 'tpope/vim-fugitive'
+  use 'tpope/vim-rhubarb'
+
+  -- utils
   use 'numToStr/Navigator.nvim'
-  use 'nvim-lua/popup.nvim'
-  use 'nvim-lua/plenary.nvim'
   use 'nvim-telescope/telescope.nvim'
-  use 'RRethy/nvim-base16'
   use 'tpope/vim-unimpaired'
   use 'tpope/vim-surround'
   use 'tpope/vim-repeat'
-  use 'tpope/vim-fugitive'
-  use 'tpope/vim-rhubarb'
-  use { 'nvim-treesitter/nvim-treesitter', run=':TSUpdate' }  -- :TSInstall python
-  use { 'mattn/emmet-vim', ft={'html', 'htmldjango'} }
+
+  -- dependencies
+  use 'nvim-tree/nvim-web-devicons'
+  use 'nvim-lua/plenary.nvim'
+
+  -- theme
+  use 'RRethy/nvim-base16'
+
 end)
 
 
@@ -115,17 +127,18 @@ vim.keymap.set('n', '<leader>:', tb.command_history)
 vim.keymap.set('n', '<leader>r', tb.resume)
 vim.keymap.set('n', '<leader>y', tb.registers)
 vim.keymap.set('n', '<leader>t', tb.lsp_document_symbols)
-vim.keymap.set('n', '<leader>s', ':tbscope grep_string search=')
+vim.keymap.set('n', '<leader>s', ':telescope grep_string search=')
 
 
 -------------------------------------------------------------------------------
--- Plugin: Fugitive -----------------------------------------------------------
+-- Plugin: Git Tools ----------------------------------------------------------
 -------------------------------------------------------------------------------
 vim.keymap.set('n', '<leader>gg', ':Git<cr>')
 vim.keymap.set('n', '<leader>gc', ':Git commit<cr>')
-vim.keymap.set('n', '<leader>gl', ':Git log %<cr>')
-vim.keymap.set('n', '<leader>gL', ':Git log --name-only<cr>')
 vim.keymap.set('n', '<leader>gb', ':Git blame<cr>')
+vim.keymap.set('n', '<leader>gd', ':DiffviewOpen<cr>')
+vim.keymap.set('n', '<leader>gl', ':DiffviewFileHistory %<cr>')
+vim.keymap.set('n', '<leader>gL', ':DiffviewFileHistory<cr>')
 
 
 -------------------------------------------------------------------------------
@@ -206,6 +219,7 @@ vim.diagnostic.config({
   }
 })
 
+
 -------------------------------------------------------------------------------
 -- LSP: Styling ---------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -222,17 +236,18 @@ local prettier = require "efm/prettier"
 local eslint = require "efm/eslint"
 local black = require "efm/black"
 
-require "lspconfig".efm.setup {
-  filetypes = { 'python', 'typescript'},
-  init_options = {documentFormatting = true, documentRangeFormatting = true},
-  settings = {
-    rootMarkers = {".git/"},
-    languages = {
-      typescript = {prettier, eslint},
-      python = {black},
-    }
-  }
-}
+-- require "lspconfig".efm.setup {
+--   filetypes = { 'python', 'typescript'},
+--   init_options = {documentFormatting = true, documentRangeFormatting = true},
+--   settings = {
+--     rootMarkers = {".git/"},
+--     languages = {
+--       typescript = {prettier, eslint},
+--       python = {black},
+--     }
+--   }
+-- }
+
 
 -------------------------------------------------------------------------------
 -- DAP (TODO) -----------------------------------------------------------------
@@ -270,6 +285,7 @@ dap.configurations.python = {
 }
 -- require("dapui").setup()
 
+
 -------------------------------------------------------------------------------
 -- Filetype Options -----------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -279,6 +295,7 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo[args.buf].commentstring = '{# %s #}'
   end
 })
+
 
 -------------------------------------------------------------------------------
 -- Theme ----------------------------------------------------------------------
@@ -293,6 +310,7 @@ if vim.wo.diff then
   vim.cmd('syntax off')
 end
 
+
 -------------------------------------------------------------------------------
 -- General Mappings -----------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -303,6 +321,7 @@ vim.keymap.set('v', '<leader>y', '"*y')
 vim.keymap.set('v', '<leader>Y', '"*Y')
 vim.keymap.set('n', '<leader>p', '"*P')
 vim.keymap.set('n', '<leader><bs>', ':noh<cr>')
+vim.keymap.set('n', '<leader><del>', ':tabclose<cr>')
 
 vim.keymap.set('n', '<leader>1', '1gt')
 vim.keymap.set('n', '<leader>2', '2gt')
