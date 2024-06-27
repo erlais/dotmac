@@ -1,10 +1,13 @@
 -- TODO: backups in increments
 -- TODO: builtin completion
 -- TODO: fix emmet
+-- TODO: snippets
 -- TODO: DAP?
 -- TODO: Check out neogit
--- TODO: Fix S-K in vim help
 -- TODO: Use lualine or just tweak custom statusline?
+-- TODO: A different python ls?
+-- TODO: Change efm to something else? pylsp, basedpyright, jedi, anakin, pylyzer, ruff
+-- TODO: Add js, html ls
 
 -------------------------------------------------------------------------------
 -- Options --------------------------------------------------------------------
