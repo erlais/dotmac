@@ -1,10 +1,8 @@
 -- TODO: builtin completion
--- TODO: fix emmet
 -- TODO: snippets
 -- TODO: DAP?
 -- TODO: A different python ls?
--- TODO: Change efm to something else? pylsp, basedpyright, jedi, anakin, pylyzer, ruff
--- TODO: Add js, html ls
+-- TODO: Add js, html ls and their formatting tools
 
 -------------------------------------------------------------------------------
 -- Options --------------------------------------------------------------------
@@ -62,8 +60,9 @@ require('packer').startup(function()
   use 'neovim/nvim-lspconfig'
   use 'mfussenegger/nvim-dap'
   use 'rcarriga/nvim-dap-ui'
-  use { 'nvim-treesitter/nvim-treesitter', run=':TSUpdate' }  -- :TSInstall python
-  use { 'mattn/emmet-vim', ft={'html', 'htmldjango'} }
+  use 'mattn/emmet-vim'
+  use { 'nvim-treesitter/nvim-treesitter', run=':TSUpdate' }
+  -- :TSInstall python, lua, markdown, vimdoc, help etc...
 
   -- git
   use 'sindrets/diffview.nvim'
@@ -146,8 +145,8 @@ vim.keymap.set('n', '<leader>gL', ':DiffviewFileHistory<cr>')
 -------------------------------------------------------------------------------
 
 -- Python
+require'lspconfig'.ruff_lsp.setup{}  -- ruff for formatting
 require('lspconfig').pyright.setup {
-  on_attach = on_attach,
   settings = {
     python = {
       venvPath = '/Users/e/.venv',
@@ -155,7 +154,7 @@ require('lspconfig').pyright.setup {
         autoSearchPaths = true,
         diagnosticMode = 'openFilesOnly',
         useLibraryCodeForTypes = true,
-        typeCheckingMode = 'off'
+        typeCheckingMode = 'off',
       }
     }
   }
