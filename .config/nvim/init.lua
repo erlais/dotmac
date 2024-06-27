@@ -1,7 +1,5 @@
--- TODO: builtin completion
 -- TODO: snippets
 -- TODO: DAP?
--- TODO: A different python ls?
 -- TODO: Add js, html ls and their formatting tools
 
 -------------------------------------------------------------------------------
@@ -17,6 +15,7 @@ vim.opt.mouse = 'a'
 vim.opt.scrolloff = 3
 vim.opt.sidescrolloff = 6
 vim.opt.shortmess:append('Ic')
+vim.opt.completeopt:append('noselect')
 vim.opt.statusline = ' %f%m %=%l,%c   %p%%   [%{&fileencoding?&fileencoding:&encoding}] '
 
 vim.wo.number = true
@@ -40,7 +39,7 @@ vim.g.mapleader = ' '
 -- Backups --------------------------------------------------------------------
 -------------------------------------------------------------------------------
 vim.opt.backup = true
-vim.opt.backupdir = os.getenv("HOME") .. '/.local/share/nvim/backup//'
+vim.opt.backupdir = os.getenv('HOME') .. '/.local/share/nvim/backup//'
 vim.api.nvim_create_autocmd('BufWritePre', {
   group = vim.api.nvim_create_augroup('timestamp_backup', { clear = true }),
   pattern = '*',
@@ -62,7 +61,6 @@ require('packer').startup(function()
   use 'rcarriga/nvim-dap-ui'
   use 'mattn/emmet-vim'
   use { 'nvim-treesitter/nvim-treesitter', run=':TSUpdate' }
-  -- :TSInstall python, lua, markdown, vimdoc, help etc...
 
   -- git
   use 'sindrets/diffview.nvim'
@@ -130,6 +128,20 @@ vim.keymap.set('n', '<leader>s', ':telescope grep_string search=')
 
 
 -------------------------------------------------------------------------------
+-- Plugin: Treesitter ---------------------------------------------------------
+-------------------------------------------------------------------------------
+require'nvim-treesitter.configs'.setup {
+  ensure_installed = { 'python', 'lua', 'vim', 'vimdoc',
+                       'markdown', 'javascript', 'json' },
+  auto_install = true,
+  highlight = {
+    enable = true,
+    disable = { 'python' },
+  },
+}
+
+
+-------------------------------------------------------------------------------
 -- Plugin: Git Tools ----------------------------------------------------------
 -------------------------------------------------------------------------------
 vim.keymap.set('n', '<leader>gg', ':Git<cr>')
@@ -184,9 +196,10 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
     vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-    -- Completion
-    -- local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    -- vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+    -- Completion (requires version 0.11+)
+    local client = vim.lsp.get_client_by_id(ev.data.client_id)
+    vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+    --
 
     local opts = { buffer = ev.buf, silent = true }
     vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
@@ -207,7 +220,7 @@ vim.api.nvim_create_autocmd('LspAttach', {
 -------------------------------------------------------------------------------
 vim.diagnostic.config({
   virtual_text = false,
-  float = { border = "single" },
+  float = { border = 'single' },
   signs = {
     text = {
       [vim.diagnostic.severity.ERROR] = '●',
@@ -222,30 +235,10 @@ vim.diagnostic.config({
 -------------------------------------------------------------------------------
 -- LSP: Styling ---------------------------------------------------------------
 -------------------------------------------------------------------------------
-vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
+vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
   vim.lsp.handlers.hover, {
-    border = "single",
+    border = 'single',
 })
-
-
--------------------------------------------------------------------------------
--- LSP: Formatters ------------------------------------------------------------
--------------------------------------------------------------------------------
-local prettier = require "efm/prettier"
-local eslint = require "efm/eslint"
-local black = require "efm/black"
-
--- require "lspconfig".efm.setup {
---   filetypes = { 'python', 'typescript'},
---   init_options = {documentFormatting = true, documentRangeFormatting = true},
---   settings = {
---     rootMarkers = {".git/"},
---     languages = {
---       typescript = {prettier, eslint},
---       python = {black},
---     }
---   }
--- }
 
 
 -------------------------------------------------------------------------------
@@ -282,14 +275,14 @@ dap.configurations.python = {
   indxlib_autotest('parse_product', '-p'),
   indxlib_autotest('parse_product_multi_pid', '-u'),
 }
--- require("dapui").setup()
+-- require('dapui').setup()
 
 
 -------------------------------------------------------------------------------
 -- Filetype Options -----------------------------------------------------------
 -------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "htmldjango",
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'htmldjango',
   callback = function(args)
     vim.bo[args.buf].commentstring = '{# %s #}'
   end
@@ -300,11 +293,11 @@ vim.api.nvim_create_autocmd("FileType", {
 -- Theme ----------------------------------------------------------------------
 -------------------------------------------------------------------------------
 vim.cmd 'colorscheme base16-tomorrow-night'
-vim.api.nvim_set_hl(0, "DiffAdd", { bg = "#1d2f21" })
-vim.api.nvim_set_hl(0, "DiffDelete", { bg = "#2d1f21" })
-vim.api.nvim_set_hl(0, "DiffChange", { bg = "#1c2d3b" })
-vim.api.nvim_set_hl(0, "DiffText", { bg = "#2f4e66" })
-vim.api.nvim_set_hl(0, "MatchParen", { bg = "#373b41" })
+vim.api.nvim_set_hl(0, 'DiffAdd', { bg = '#1d2f21' })
+vim.api.nvim_set_hl(0, 'DiffDelete', { bg = '#2d1f21' })
+vim.api.nvim_set_hl(0, 'DiffChange', { bg = '#1c2d3b' })
+vim.api.nvim_set_hl(0, 'DiffText', { bg = '#2f4e66' })
+vim.api.nvim_set_hl(0, 'MatchParen', { bg = '#373b41' })
 if vim.wo.diff then
   vim.cmd('syntax off')
 end
@@ -320,7 +313,7 @@ vim.keymap.set('v', '<leader>y', '"*y')
 vim.keymap.set('v', '<leader>Y', '"*Y')
 vim.keymap.set('n', '<leader>p', '"*P')
 vim.keymap.set('n', '<leader><bs>', ':noh<cr>')
-vim.keymap.set('n', '<leader><del>', ':tabclose<cr>')
+vim.keymap.set('n', '<leader>c', ':tabclose<cr>')
 
 vim.keymap.set('n', '<leader>1', '1gt')
 vim.keymap.set('n', '<leader>2', '2gt')
