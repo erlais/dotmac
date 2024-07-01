@@ -1,6 +1,7 @@
 -- TODO: snippets
 -- TODO: DAP?
 -- TODO: Add js, html ls and their formatting tools
+-- TODO: Neorg or some other notetaking
 
 -------------------------------------------------------------------------------
 -- Options --------------------------------------------------------------------
@@ -124,7 +125,7 @@ vim.keymap.set('n', '<leader>:', tb.command_history)
 vim.keymap.set('n', '<leader>r', tb.resume)
 vim.keymap.set('n', '<leader>y', tb.registers)
 vim.keymap.set('n', '<leader>t', tb.lsp_document_symbols)
-vim.keymap.set('n', '<leader>s', ':telescope grep_string search=')
+vim.keymap.set('n', '<leader>s', ':Telescope grep_string search=')
 
 
 -------------------------------------------------------------------------------
@@ -137,6 +138,9 @@ require'nvim-treesitter.configs'.setup {
   highlight = {
     enable = true,
     disable = { 'python' },
+  },
+  indent = {
+    enable = true,
   },
 }
 
