@@ -20,7 +20,7 @@ alias finder='open -a finder'
 alias vi='nvim'
 alias ls='ls -G'
 alias ll='ls -alG'
-alias dc='docker-compose'
+alias dc='docker compose'
 alias ip='curl -4 ifconfig.co'
 
 alias gs='git status'
@@ -29,6 +29,9 @@ alias gp='git push'
 alias gu='git pull --ff-only'
 alias gr='git pull --rebase --autostash'
 
+alias uve='uv run --env-file "$(git rev-parse --show-toplevel)/.env"'
+
+# Move up a category
 bindkey -s "^o" "cd ..\n"
 function chpwd() {
     emulate -L zsh
@@ -38,3 +41,6 @@ function chpwd() {
 function workon () {
   source $HOME/.venv/$1/bin/activate
 }
+
+# Bitwarden SSH Agent
+export SSH_AUTH_SOCK=$HOME/Library/Containers/com.bitwarden.desktop/Data/.bitwarden-ssh-agent.sock

@@ -1,7 +1,12 @@
--- TODO: snippets
--- TODO: DAP?
--- TODO: Add js, html ls and their formatting tools
--- TODO: Neorg or some other notetaking
+-- TODO: Add js, html ls and their formatting tools.
+  -- Use `:%!jq` for now (brew install jq) for strict json
+  -- or `:%!prettier --stdin-filepath %` for jsonc
+  -- Set up none-ls for better formatting json?
+  -- For now I have ts_ls for javascript and emmet for html. Good enough?
+-- TODO: snippets, DAP, LLM
+-- TODO: Neorg, obsidian or some other notetaking
+-- TODO: Current function statusline?
+-- TODO: What was the sick spelling addon that I saw on YT?
 
 -------------------------------------------------------------------------------
 -- Options --------------------------------------------------------------------
@@ -15,8 +20,9 @@ vim.opt.inccommand = 'nosplit'
 vim.opt.mouse = 'a'
 vim.opt.scrolloff = 3
 vim.opt.sidescrolloff = 6
+vim.opt.splitright = true
 vim.opt.shortmess:append('Ic')
-vim.opt.completeopt:append('noselect')
+vim.opt.completeopt = { 'menuone', 'popup', 'noselect' }
 vim.opt.statusline = ' %f%m %=%l,%c   %p%%   [%{&fileencoding?&fileencoding:&encoding}] '
 
 vim.wo.number = true
@@ -27,11 +33,12 @@ vim.wo.foldlevel = 99
 vim.wo.foldmethod = 'expr'
 vim.wo.foldexpr = 'nvim_treesitter#foldexpr()'
 
-vim.bo.expandtab = true
-vim.bo.textwidth = 0
-vim.bo.shiftwidth = 2
-vim.bo.softtabstop = 2
-vim.bo.tabstop = 2
+vim.o.expandtab = true
+vim.o.textwidth = 0
+vim.o.shiftwidth = 2
+vim.o.softtabstop = 2
+vim.o.tabstop = 2
+vim.o.winborder = 'rounded'
 
 vim.g.mapleader = ' '
 
@@ -75,6 +82,9 @@ require('packer').startup(function()
   use 'tpope/vim-surround'
   use 'tpope/vim-repeat'
 
+  -- note taking
+  -- TODO: add obsidian
+
   -- dependencies
   use 'nvim-tree/nvim-web-devicons'
   use 'nvim-lua/plenary.nvim'
@@ -105,6 +115,7 @@ vim.keymap.set({'n', 't'}, '<M-j>', nav.down)
 local ta = require('telescope.actions')
 require('telescope').setup{
   defaults = {
+    border = false,
     mappings = {
       i = {
         ['<C-j>'] = ta.move_selection_next,
@@ -138,10 +149,7 @@ require'nvim-treesitter.configs'.setup {
   highlight = {
     enable = true,
     disable = { 'python' },
-  },
-  indent = {
-    enable = true,
-  },
+  }
 }
 
 
@@ -161,11 +169,16 @@ vim.keymap.set('n', '<leader>gL', ':DiffviewFileHistory<cr>')
 -------------------------------------------------------------------------------
 
 -- Python
-require'lspconfig'.ruff_lsp.setup{}  -- ruff for formatting
-require('lspconfig').pyright.setup {
+vim.lsp.config('ruff', {
+  cmd = {'uv', 'run', 'ruff', 'server'},
+  -- root_markers = {'pyproject.toml', '.git'},
+})
+vim.lsp.enable('ruff')
+
+vim.lsp.config('pyright', {
   settings = {
     python = {
-      venvPath = '/Users/e/.venv',
+      pythonPath = '.venv/bin/python',
       analysis = {
         autoSearchPaths = true,
         diagnosticMode = 'openFilesOnly',
@@ -174,15 +187,14 @@ require('lspconfig').pyright.setup {
       }
     }
   }
-}
+})
+vim.lsp.enable('pyright')
 
 -- Typescript
-require('lspconfig').tsserver.setup {
-  on_attach = function(client)
-    client.resolved_capabilities.document_formatting = false
-    on_attach(client)
-  end
-}
+vim.lsp.enable('ts_ls')
+-- Had doc formatting disabled before:
+-- client.resolved_capabilities.document_formatting = false
+
 
 -------------------------------------------------------------------------------
 -- LSP: Global Mappings -------------------------------------------------------
@@ -198,12 +210,12 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
 -------------------------------------------------------------------------------
 vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(ev)
-    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
+    local client = assert(vim.lsp.get_client_by_id(ev.data.client_id))
+    -- TODO: Need this?: vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-    -- Completion (requires version 0.11+)
-    local client = vim.lsp.get_client_by_id(ev.data.client_id)
-    vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-    --
+    if client:supports_method('textDocument/completion') then
+      vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+    end
 
     local opts = { buffer = ev.buf, silent = true }
     vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
@@ -211,10 +223,11 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
     vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
     vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+    vim.keymap.set('n', '<leader>c', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
-    vim.keymap.set({'n', 'v'}, '<leader>f', vim.lsp.buf.format, opts)
+    vim.keymap.set({'n', 'x'}, '<leader>f', vim.lsp.buf.format, opts)
 
   end,
 })
@@ -241,7 +254,7 @@ vim.diagnostic.config({
 -------------------------------------------------------------------------------
 vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
   vim.lsp.handlers.hover, {
-    border = 'single',
+    winborder = 'single',
 })
 
 
@@ -292,6 +305,14 @@ vim.api.nvim_create_autocmd('FileType', {
   end
 })
 
+-- Format JSON (brew install jq prettier)
+vim.api.nvim_create_user_command("FormatJson", function()
+  vim.cmd("%!prettier --stdin-filepath " .. vim.fn.shellescape(vim.fn.expand("%")))
+end, {})
+vim.api.nvim_create_user_command("FormatJsonStrict", function()
+  vim.cmd("%!jq")
+end, {})
+
 
 -------------------------------------------------------------------------------
 -- Theme ----------------------------------------------------------------------
@@ -313,11 +334,11 @@ end
 vim.keymap.set('n', 'Y', 'Y')
 vim.keymap.set('n', '0', '_')
 vim.keymap.set('n', '<leader>a', 'ggVG')
-vim.keymap.set('v', '<leader>y', '"*y')
-vim.keymap.set('v', '<leader>Y', '"*Y')
+vim.keymap.set('x', '<leader>y', '"*y')
+vim.keymap.set('x', '<leader>Y', '"*Y')
 vim.keymap.set('n', '<leader>p', '"*P')
 vim.keymap.set('n', '<leader><bs>', ':noh<cr>')
-vim.keymap.set('n', '<leader>c', ':tabclose<cr>')
+--vim.keymap.set('n', '<leader>x', ':tabclose<cr>')
 
 vim.keymap.set('n', '<leader>1', '1gt')
 vim.keymap.set('n', '<leader>2', '2gt')
@@ -329,4 +350,6 @@ vim.keymap.set('n', '<leader>7', '7gt')
 vim.keymap.set('n', '<leader>8', '8gt')
 vim.keymap.set('n', '<leader>9', '9gt')
 
-vim.keymap.set('n', '<leader>x', function() print(vim.fn['nvim_treesitter#statusline']()) end)
+vim.keymap.set('i', '<c-space>', function() vim.lsp.completion.get() end)
+vim.keymap.set('i', '<Tab>', function() return vim.fn.pumvisible() == 1 and '<C-n>' or '<Tab>' end, { expr = true })
+vim.keymap.set('i', '<S-Tab>', function() return vim.fn.pumvisible() == 1 and '<C-p>' or '<S-Tab>' end, { expr = true })
