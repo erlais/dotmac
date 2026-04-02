@@ -142,7 +142,7 @@ vim.keymap.set('n', '<leader>s', ':Telescope grep_string search=')
 -------------------------------------------------------------------------------
 -- Plugin: Treesitter ---------------------------------------------------------
 -------------------------------------------------------------------------------
-require'nvim-treesitter.configs'.setup {
+require'nvim-treesitter.config'.setup {
   ensure_installed = { 'python', 'lua', 'vim', 'vimdoc',
                        'markdown', 'javascript', 'json' },
   auto_install = true,
@@ -246,15 +246,6 @@ vim.diagnostic.config({
       [vim.diagnostic.severity.INFO] = '●',
     }
   }
-})
-
-
--------------------------------------------------------------------------------
--- LSP: Styling ---------------------------------------------------------------
--------------------------------------------------------------------------------
-vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(
-  vim.lsp.handlers.hover, {
-    winborder = 'single',
 })
 
 
