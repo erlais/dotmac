@@ -11,6 +11,11 @@ defaults write com.apple.dock autohide-time-modifier -float 0.25;
 killall Dock;
 ```
 
+## Disable input language indicator popup
+```
+defaults write kCFPreferencesAnyApplication TSMLanguageIndicatorEnabled 0
+```
+
 ## If tmux navigator shortcuts M-{h,j,k,l} etc don't work in iterm
 * Try reloading iterm profile
 * The profile must have "Report keys using CSI u" enabled. It's under `Profiles` -> `Keys` -> `General`
